@@ -78,6 +78,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/faculty/**").hasRole("FACULTY")
                         .requestMatchers("/api/student/**").hasRole("STUDENT")
 
+                        //ai, predict grade or recommend course
+                        .requestMatchers("/api/ai/**").permitAll()
+
                         // everything else requires auth
                         .anyRequest().authenticated()
                 )
