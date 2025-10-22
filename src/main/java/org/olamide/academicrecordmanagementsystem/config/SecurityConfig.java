@@ -81,6 +81,9 @@ public class SecurityConfig {
                         //ai, predict grade or recommend course
                         .requestMatchers("/api/ai/**").permitAll()
 
+                        //generate quizz
+                        .requestMatchers("/api/quiz/**").permitAll()
+
                         // everything else requires auth
                         .anyRequest().authenticated()
                 )

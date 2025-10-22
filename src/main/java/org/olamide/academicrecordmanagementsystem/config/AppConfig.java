@@ -1,5 +1,6 @@
 package org.olamide.academicrecordmanagementsystem.config;
 
+import org.olamide.academicrecordmanagementsystem.service.ai.GeminiAIService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -10,4 +11,5 @@ public class AppConfig {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
 }
