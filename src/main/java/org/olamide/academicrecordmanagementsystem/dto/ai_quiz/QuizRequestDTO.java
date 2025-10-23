@@ -1,4 +1,4 @@
-package org.olamide.academicrecordmanagementsystem.dto.ai;
+package org.olamide.academicrecordmanagementsystem.dto.ai_quiz;
 
 public class QuizRequestDTO {
     private String topic;

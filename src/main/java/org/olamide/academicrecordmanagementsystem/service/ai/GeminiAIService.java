@@ -2,7 +2,7 @@ package org.olamide.academicrecordmanagementsystem.service.ai;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.olamide.academicrecordmanagementsystem.dto.ai.QuizQuestionDTO;
+import org.olamide.academicrecordmanagementsystem.dto.ai_quiz.QuizQuestionDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -73,12 +73,58 @@ public class GeminiAIService {
 
     private List<QuizQuestionDTO> parseQuizQuestions(String jsonResponse) {
         try {
-            // Remove markdown code blocks if present
             jsonResponse = jsonResponse.replaceAll("```json\\s*", "").replaceAll("```\\s*", "").trim();
 
             return objectMapper.readValue(jsonResponse, new TypeReference<List<QuizQuestionDTO>>() {});
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse quiz questions: " + e.getMessage() + "\nResponse: " + jsonResponse, e);
         }
+    }
+    public String generateHint(String question, List<String> options, String correctAnswer) {
+        String prompt = String.format(
+                "You are a helpful tutor. A student is stuck on this multiple-choice question:\n\n" +
+                        "Question: %s\n\n" +
+                        "Options:\n%s\n\n" +
+                        "Generate a helpful hint that guides the student toward the correct answer ('%s') " +
+                        "WITHOUT directly revealing it. The hint should:\n" +
+                        "1. Point them in the right direction\n" +
+                        "2. Help them understand the concept\n" +
+                        "3. Not give away the answer directly\n" +
+                        "Keep the hint concise (2-3 sentences).",
+                question,
+                formatOptions(options),
+                correctAnswer
+        );
+
+        Map<String, Object> requestBody = new HashMap<>();
+        Map<String, Object> content = new HashMap<>();
+        Map<String, String> part = new HashMap<>();
+
+        part.put("text", prompt);
+        content.put("parts", List.of(part));
+        requestBody.put("contents", List.of(content));
+
+        try {
+            Map<String, Object> response = webClient.post()
+                    .uri(apiUrl + "?key=" + apiKey)
+                    .header("Content-Type", "application/json")
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+
+            return extractTextFromResponse(response);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate hint: " + e.getMessage(), e);
+        }
+    }
+
+    private String formatOptions(List<String> options) {
+        StringBuilder sb = new StringBuilder();
+        char label = 'A';
+        for (String option : options) {
+            sb.append(label++).append(". ").append(option).append("\n");
+        }
+        return sb.toString();
     }
 }

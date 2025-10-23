@@ -1,4 +1,4 @@
-package org.olamide.academicrecordmanagementsystem.dto.ai;
+package org.olamide.academicrecordmanagementsystem.dto.ai_quiz;
 import java.util.List;
 
 public class QuizQuestionDTO {
